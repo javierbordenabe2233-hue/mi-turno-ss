@@ -1,0 +1,23 @@
+{
+  "name": "Mi Turno · Paso San Sebastián",
+  "short_name": "Mi Turno SS",
+  "description": "Cargá el PDF de la grilla del Paso San Sebastián y consultá tu horario, sector y con quién te toca.",
+  "lang": "es-AR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef1f5",
+  "theme_color": "#1d55c9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "title": "title", "text": "text", "files": [ { "name": "pdf", "accept": ["application/pdf", ".pdf"] } ] }
+  }
+}

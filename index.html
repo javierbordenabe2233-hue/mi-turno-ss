@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Grilla San Sebastián</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d55c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mi Turno SS">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+.install{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px}
+.install p{margin:0;flex:1;min-width:0;font-size:15px}
+.install .x{border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;padding:4px 8px;cursor:pointer}
+.offline{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent-ink);color:var(--accent);border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una columna tipo cartel de ruta; barra azul arriba, tarjetas por día con el color de fila de la grilla */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --ink:#0f1b2d; --muted:#5a6678; --line:#d6dce5;
+  --accent:#1d55c9; --accent-ink:#ffffff; --accent-soft:#e3ebfb;
+  --sm:#fde59a; --st:#a6d39a; --eme:#f7a23c; --em:#a9c4f5; --et:#f4c9cb; --nn:#e2e6ec;
+  --cell-ink:#1a2333; --now:#0f8a4f;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b111c; --surface:#131c2b; --ink:#e7edf6; --muted:#97a3b6; --line:#263247;
+  --accent:#6f9dff; --accent-ink:#0b111c; --accent-soft:#1a2a4a;
+  --sm:#5c4b14; --st:#2f5a2a; --eme:#7a4510; --em:#22406f; --et:#6a3236; --nn:#2a3343;
+  --cell-ink:#eef2f8; --now:#4fd18f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b111c; --surface:#131c2b; --ink:#e7edf6; --muted:#97a3b6; --line:#263247;
+  --accent:#6f9dff; --accent-ink:#0b111c; --accent-soft:#1a2a4a;
+  --sm:#5c4b14; --st:#2f5a2a; --eme:#7a4510; --em:#22406f; --et:#6a3236; --nn:#2a3343;
+  --cell-ink:#eef2f8; --now:#4fd18f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--accent)}
+.wrap{max-width:680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button,label.btn{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--accent);color:var(--accent-ink)}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{flex:1;min-width:0}
+.brand small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
+.brand b{font-family:var(--display);font-size:24px;letter-spacing:.02em;line-height:1.05;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:8px;padding:10px 14px;font-weight:600;font-size:15px}
+.btn-load{background:var(--accent-ink);color:var(--accent)}
+.btn-ghost{background:transparent;color:var(--accent);border:1.5px solid var(--line)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn svg{width:18px;height:18px;flex:none}
+
+main.wrap{display:flex;flex-direction:column;gap:18px;padding-block:18px 40px}
+.msg{border-radius:10px;padding:12px 14px;background:var(--accent-soft);font-size:15px}
+.msg.err{background:var(--et);color:var(--cell-ink)}
+.msg[hidden]{display:none}
+
+h2{font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.06em;margin:0;text-wrap:balance}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
+
+/* quién sos */
+.who{display:flex;flex-direction:column;gap:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px}
+.chip:hover{border-color:var(--accent)}
+.me{display:flex;align-items:center;gap:12px}
+.me .nm{font-family:var(--display);font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.me .sub{color:var(--muted);font-size:14px}
+.me .grow{flex:1;min-width:0}
+
+/* tabs */
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:7px;font-weight:700;font-size:15px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* turnos */
+.next{background:var(--surface);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px;border:1.5px solid var(--line)}
+.next .when{font-weight:700;color:var(--accent)}
+.next .when.live{color:var(--now)}
+.next .hrs{font-family:var(--display);font-size:46px;line-height:1;letter-spacing:.01em}
+.list{display:flex;flex-direction:column;gap:12px}
+.day{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.day.past{opacity:.6}
+.day.today{border-color:var(--accent)}
+.day-h{display:flex;align-items:center;gap:12px;padding:12px 14px;color:var(--cell-ink)}
+.date{display:flex;flex-direction:column;align-items:center;width:46px;flex:none}
+.date .dw{font-size:12px;font-weight:700;letter-spacing:.1em}
+.date .dn{font-family:var(--display);font-size:30px;line-height:1}
+.day-h .main{flex:1;min-width:0}
+.day-h .hrs{font-family:var(--display);font-size:26px;line-height:1.05}
+.day-h .tag{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.day-b{padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.row{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:baseline}
+.row > span:first-child{color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.names{font-weight:700;min-width:0}
+.names i{font-style:normal;font-weight:500;color:var(--muted)}
+.k-SM{background:var(--sm)} .k-ST{background:var(--st)} .k-EME{background:var(--eme)} .k-EM{background:var(--em)} .k-ET{background:var(--et)} .k-NN{background:var(--nn)}
+.free{padding:12px 14px;color:var(--muted);display:flex;gap:12px;align-items:center}
+
+/* por día */
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.days button{flex:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;min-width:56px}
+.days button b{font-family:var(--display);font-size:22px;line-height:1}
+.days button small{font-size:11px;font-weight:700;letter-spacing:.08em}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.sector{display:flex;flex-direction:column;gap:8px}
+.slots{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.slot{display:grid;grid-template-columns:8px 112px 1fr;align-items:center;border-top:1px solid var(--line)}
+.slot:first-child{border-top:0}
+.slot .sw{align-self:stretch}
+.slot .t{padding:10px 0 10px 12px;font-weight:700}
+.slot .t small{display:block;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.slot .p{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.pn{font-weight:700;padding:3px 9px;border-radius:6px;background:var(--bg)}
+.pn.sup{border:1.5px dashed var(--muted)}
+.pn.mine{background:var(--accent);color:var(--accent-ink)}
+
+/* pie */
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
+.drop p{margin:0;color:var(--muted);max-width:44ch}
+.loaded{display:flex;flex-direction:column;gap:6px}
+.loaded li{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.loaded ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.loaded li span{flex:1;min-width:0}
+.loaded li button{border:0;background:transparent;color:var(--muted);font-weight:600;padding:4px 6px}
+.note{font-size:13px;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--accent) 85%,transparent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-size:32px;text-transform:uppercase;z-index:20}
+@media (max-width:420px){.row{grid-template-columns:1fr;gap:0}.slot{grid-template-columns:8px 96px 1fr}.next .hrs{font-size:40px}}
+@media (prefers-reduced-motion:no-preference){.tabs button,.chip,.days button{transition:background .15s,border-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <div class="brand"><small>Paso fronterizo · Ruta 3</small><b>San Sebastián</b></div>
+  <label class="btn btn-load" for="file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Cargar PDF</label>
+  <input id="file" type="file" accept="application/pdf,.pdf" hidden>
+</div></header>
+
+<main class="wrap">
+  <div id="msg" class="msg" role="status" hidden></div>
+  <section id="who" class="who"></section>
+  <div id="tabs" class="tabs" role="tablist">
+    <button id="tab-me" role="tab" aria-selected="true">Mis turnos</button>
+    <button id="tab-day" role="tab" aria-selected="false">Por día</button>
+  </div>
+  <section id="view-me" class="list"></section>
+  <section id="view-day" class="list" hidden></section>
+  <section class="drop" id="dropzone">
+    <h2>Grilla nueva</h2>
+    <p>Cuando te llegue el PDF de la semana, tocá <b>Cargar PDF</b> y elegilo. También podés arrastrarlo o pegarlo acá. Se lee en tu teléfono y no se sube a ningún lado.</p>
+    <label class="btn btn-primary" for="file">Elegir PDF de la grilla</label>
+  </section>
+  <section class="loaded" id="loaded"></section>
+</main>
+<div id="overlay" class="overlay" hidden>Soltá el PDF</div>
+
+<script src="pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";</script>
+<script>
+/* Lector de la grilla del Paso San Sebastián.
+   Recibe los textos del PDF con su posición (x, y desde arriba, ancho) y arma los turnos. */
+var GrillaParser = (function () {
+  var RE_DATE = /^(\d{1,2})\/(\d{1,2})$/;
+  var RE_HOURS = /(\d{1,2})[:.](\d{2})\s*A\s*(\d{1,2})[:.](\d{2})/i;
+  var RE_SECTOR = /^(SALIDA|ENTRADA)$/i;
+  var RE_GROUP = /^\d+\s*[º°A-Z]*\s+TURNO$/i;
+  var DAYNAMES = /^(LUNES|MARTES|MI[EÉ]RCOLES|JUEVES|VIERNES|S[AÁ]BADO|DOMINGO)$/i;
+  var RE_ADJ = /\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/;
+  var RE_ADJ_G = /(\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2})(?:\s+(SALIDA|ENTRADA))?/i;
+  var STOP = /^(TURNO|MA[ÑN]ANA|TARDE|MEDIO|NOCHE|DE|A|INSPECTORES|SUPERVISORES)$/i;
+
+  function norm(s) { return s.replace(/\s+/g, ' ').trim(); }
+  function nearest(list, y, maxDist) {
+    var best = null, bd = Infinity;
+    list.forEach(function (it) { var d = Math.abs(it.y - y); if (d < bd) { bd = d; best = it; } });
+    return bd <= maxDist ? best : null;
+  }
+  function prevDay(key) { var p = key.split('-'); var d = new Date(+p[0], p[1] - 1, +p[2] - 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function median(a) { var b = a.slice().sort(function (p, q) { return p - q; }); return b[Math.floor(b.length / 2)]; }
+  function mins(h, m) { return (+h) * 60 + (+m); }
+  function hoursOf(s) { var m = s.match(RE_HOURS); return m ? { start: mins(m[1], m[2]), end: mins(m[3], m[4]) } : null; }
+  function clusterY(items, tol) {
+    var rows = [];
+    items.slice().sort(function (a, b) { return a.y - b.y; }).forEach(function (it) {
+      var r = rows[rows.length - 1];
+      if (r && Math.abs(r.y - it.y) <= tol) r.items.push(it); else rows.push({ y: it.y, items: [it] });
+    });
+    return rows;
+  }
+
+  function parse(raw, opts) {
+    opts = opts || {};
+    var items = raw.map(function (it) { return { s: norm(it.s), x: it.x, y: it.y, w: it.w, cx: it.x + it.w / 2 }; })
+      .filter(function (it) { return it.s; });
+    // dedupe identical text at the same spot (celdas combinadas)
+    var seen = {};
+    items = items.filter(function (it) { var k = it.s + '@' + Math.round(it.x) + ',' + Math.round(it.y); if (seen[k]) return false; seen[k] = 1; return true; });
+
+    var title = '', period = null, kind = '';
+    items.forEach(function (it) {
+      if (/GRILLA/i.test(it.s) && !title) title = it.s;
+      var m = it.s.match(/del\s+(\S+)\s+(\d{1,2})\/(\d{1,2})\s*\((\d{1,2}:\d{2})\)\s+al\s+(\S+)\s+(\d{1,2})\/(\d{1,2})\s*\((\d{1,2}:\d{2})\)/i);
+      if (m) { var tp = it.s.split(/\s+·\s+|\s{2,}·/)[0]; if (tp && tp.length < 40 && tp !== it.s) kind = norm(tp.replace(/·.*$/, '')); }
+      if (m) period = { from: { d: +m[2], m: +m[3], t: m[4] }, to: { d: +m[6], m: +m[7], t: m[8] } };
+    });
+
+    var dateItems = items.filter(function (it) { return RE_DATE.test(it.s); });
+    var headers = clusterY(dateItems, 3).filter(function (r) { return r.items.length >= 2; });
+    if (!headers.length) throw new Error('No encontré las fechas de la grilla.');
+
+    // año: el que deja la primera fecha más cerca de hoy
+    var now = opts.now || new Date();
+    var f0 = headers[0].items.slice().sort(function (a, b) { return a.cx - b.cx; })[0].s.match(RE_DATE);
+    var year = now.getFullYear(), bestD = Infinity;
+    [year - 1, year, year + 1].forEach(function (y) { var d = Math.abs(new Date(y, f0[2] - 1, f0[1]) - now); if (d < bestD) { bestD = d; year = y; } });
+
+    var shifts = [], groups = {}, roles = {}, days = {};
+    headers.forEach(function (h, hi) {
+      var top = h.y, bottom = hi + 1 < headers.length ? headers[hi + 1].y - 25 : Infinity;
+      var titleIt = nearest(items.filter(function (it) { return it.y < top && it.y > top - 40 && !/\d/.test(it.s) && /^[A-ZÁÉÍÓÚÑ ]+$/.test(it.s); }), top - 15, 40);
+      var role = titleIt ? titleIt.s : 'PERSONAL';
+      var dates = h.items.slice().sort(function (a, b) { return a.cx - b.cx; });
+      var n = dates.length;
+      var diffs = []; for (var i = 1; i < n - 1; i++) diffs.push(dates[i].cx - dates[i - 1].cx);
+      var sp = diffs.length ? median(diffs) : (n > 1 ? dates[1].cx - dates[0].cx : 60);
+      var cols = dates.map(function (d, i) { return i === 0 ? d.cx : null; });
+      for (i = 1; i < n; i++) cols[i] = (i < n - 1 || Math.abs(dates[i].cx - dates[i - 1].cx - sp) < sp * 0.2) ? dates[i].cx : cols[i - 1] + sp;
+      var gridL = cols[0] - sp / 2, gridR = cols[n - 1] + sp / 2;
+      var dayNameY = top + 8;
+      var dayNames = items.filter(function (it) { return DAYNAMES.test(it.s) && Math.abs(it.y - top) < 20; });
+      if (dayNames.length) dayNameY = Math.max.apply(null, dayNames.map(function (d) { return d.y; }));
+      var area = items.filter(function (it) { return it.y > dayNameY + 3 && it.y < bottom; });
+
+      var dateObjs = dates.map(function (d) {
+        var m = d.s.match(RE_DATE); var mo = +m[2], y = year;
+        if (+f0[2] === 12 && mo === 1) y = year + 1;
+        var key = y + '-' + String(mo).padStart(2, '0') + '-' + String(+m[1]).padStart(2, '0');
+        days[key] = true;
+        return key;
+      });
+
+      var hoursL = [], hoursR = [], sectors = [], cells = [];
+      area.forEach(function (it) {
+        var hr = hoursOf(it.s);
+        if (hr && /DE\s/i.test(it.s)) {
+          var sm = it.s.match(/(SALIDA|ENTRADA)\s*$/i);
+          (it.cx > gridR ? hoursR : it.cx < gridL ? hoursL : []).push({ y: it.y, h: hr, x: it.x, sec: sm ? sm[1].toUpperCase() : '' });
+          return;
+        }
+        if (it.cx >= gridL && it.cx <= gridR) { if (!RE_DATE.test(it.s) && !DAYNAMES.test(it.s)) cells.push(it); return; }
+        if (it.cx < gridL) cells.push(it);
+      });
+      if (!hoursL.length) return;
+      var hoursX = Math.min.apply(null, hoursL.map(function (o) { return o.x; }));
+      var gridCells = cells.filter(function (c) { return c.cx >= gridL; });
+      // filas: grupos de nombres alineados (cada fila tiene un nombre por día)
+      var anchors = clusterY(gridCells.filter(function (c) { return !RE_ADJ.test(c.s); }), 2.5)
+        .filter(function (r) { return r.items.length >= 3; })
+        .map(function (r) { return median(r.items.map(function (i) { return i.y; })); });
+      if (!anchors.length) return;
+      var pitch = anchors.length > 1 ? median(anchors.slice(1).map(function (y, i) { return y - anchors[i]; })) : 15;
+      function rowOf(y) { var bi = -1, bd = Infinity; anchors.forEach(function (a, i) { var d = Math.abs(a - y); if (d < bd) { bd = d; bi = i; } }); return bd <= pitch * 0.5 ? bi : -1; }
+      var leftItems = cells.filter(function (c) { return c.cx < gridL; });
+      sectors = leftItems.filter(function (c) { return RE_SECTOR.test(c.s); });
+      var secMax = Math.max.apply(null, sectors.map(function (s) { return s.cx; }));
+      var mainSec = sectors.filter(function (s) { return s.cx > secMax - 15; });
+      var mainSecL = Math.min.apply(null, mainSec.map(function (s) { return s.x; }));
+      var turnos = leftItems.filter(function (it) { return it.cx > secMax + 15 && it.x + it.w < hoursX - 2; });
+      function near(list, y) { return nearest(list, y, pitch * 0.45); }
+
+      function addShift(dateKey, name, o) {
+        name = name.toUpperCase();
+        roles[name] = role;
+        shifts.push({ date: dateKey, name: name, role: role, sector: o.sector, turno: o.turno,
+          start: o.start, end: o.end <= o.start ? o.end + 1440 : o.end, note: o.note || '', adj: !!o.adj, part: o.part || 'dia' });
+      }
+      function splitCell(txt) {
+        var m = txt.match(RE_ADJ_G);
+        if (!m) return { name: txt, adj: null };
+        var hh = m[1].match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+        return { name: norm(txt.replace(m[0], '')), adj: { start: mins(hh[1], hh[2]), end: mins(hh[3], hh[4]), sector: m[2] ? m[2].toUpperCase() : '' } };
+      }
+
+      // grilla principal (sábado a viernes de cierre)
+      var rowsTxt = anchors.map(function () { return {}; });
+      gridCells.forEach(function (c) {
+        var r = rowOf(c.y); if (r < 0) return;
+        var bi = 0, bd = Infinity;
+        cols.forEach(function (cx, i) { var d = Math.abs(cx - c.cx); if (d < bd) { bd = d; bi = i; } });
+        if (bd > sp * 0.6) return;
+        var cur = rowsTxt[r][bi];
+        // el texto de ajuste va debajo del nombre
+        rowsTxt[r][bi] = cur ? (RE_ADJ.test(c.s) ? cur + ' ' + c.s : c.s + ' ' + cur) : c.s;
+      });
+      anchors.forEach(function (ay, r) {
+        var sec = near(mainSec, ay), tu = near(turnos, ay), hl = near(hoursL, ay), hr = near(hoursR, ay);
+        if (!hl) return;
+        var sector = sec ? sec.s.toUpperCase() : '', turno = tu ? tu.s.toUpperCase().replace(/^TURNO\s+/, '') : '';
+        Object.keys(rowsTxt[r]).forEach(function (k) {
+          var i = +k, cell = splitCell(rowsTxt[r][k]);
+          if (!cell.name) return;
+          var last = i === n - 1;
+          var o = { sector: sector, turno: turno, start: hl.h.start, end: hl.h.end, part: last ? 'cierre' : 'dia' };
+          if (last && hr) { o.start = hr.h.start; o.end = hr.h.end; o.note = 'Cierre de grilla'; if (hr.sec) o.sector = hr.sec; }
+          if (cell.adj) { o.start = cell.adj.start; o.end = cell.adj.end; if (cell.adj.sector) o.sector = cell.adj.sector; o.adj = true; o.note = 'Horario especial'; }
+          addShift(dateObjs[i], cell.name, o);
+        });
+      });
+
+      // tabla de la izquierda: viernes de inicio (1er turno 13:00 a 17:30, 2do turno 17:20 a 22:00)
+      var left = leftItems.filter(function (it) { return it.x + it.w < mainSecL - 5; });
+      var gLabels = left.filter(function (it) { return RE_GROUP.test(it.s); });
+      var lSecs = left.filter(function (it) { return RE_SECTOR.test(it.s); });
+      var lRows = {};
+      left.forEach(function (it) {
+        if (RE_GROUP.test(it.s) || RE_SECTOR.test(it.s) || STOP.test(it.s)) return;
+        if (/\d/.test(it.s) && !RE_ADJ.test(it.s)) return;
+        var r = rowOf(it.y); if (r < 0) return;
+        var cur = lRows[r];
+        lRows[r] = cur ? (RE_ADJ.test(it.s) ? cur + ' ' + it.s : it.s + ' ' + cur) : it.s;
+      });
+      var d0 = prevDay(dateObjs[0]);
+      Object.keys(lRows).forEach(function (r) {
+        var ay = anchors[r], cell = splitCell(lRows[r]);
+        if (!cell.name || STOP.test(cell.name)) return;
+        var g = nearest(gLabels, ay, 200), s = nearest(lSecs, ay, 100);
+        var first = !g || /^1/.test(g.s);
+        var o = { sector: s ? s.s.toUpperCase() : '', turno: first ? '1ER TURNO' : '2DO TURNO',
+          start: first ? 780 : 1040, end: first ? 1050 : 1320, note: 'Viernes de inicio', part: 'ini' };
+        if (cell.adj) { o.start = cell.adj.start; o.end = cell.adj.end; if (cell.adj.sector) o.sector = cell.adj.sector; o.adj = true; o.note = 'Horario especial'; }
+        groups[cell.name.toUpperCase()] = { group: o.turno, sector: o.sector };
+        days[d0] = true;
+        addShift(d0, cell.name, o);
+      });
+    });
+    if (!shifts.length) throw new Error('No encontré turnos en el PDF.');
+    var dayList = Object.keys(days).sort();
+    var people = Object.keys(roles).sort().map(function (nm) { return { name: nm, role: roles[nm], group: groups[nm] ? groups[nm].group : '', groupSector: groups[nm] ? groups[nm].sector : '' }; });
+    return { title: title || 'GRILLA', kind: kind, period: period, year: year, days: dayList, people: people, shifts: shifts,
+      id: dayList[0] + '_' + dayList[dayList.length - 1] };
+  }
+  return { parse: parse };
+})();
+if (typeof module !== 'undefined') module.exports = GrillaParser;
+
+</script>
+<script>
+(function(){
+var PRELOADED = null;
+var KEY_GRIDS='grillaSS.grids.v2', KEY_ME='grillaSS.me.v1';
+var DW=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+var DWL=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function hm(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function dObj(key){var p=key.split('-');return new Date(+p[0],p[1]-1,+p[2])}
+function dd(key){var d=dObj(key);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')}
+function todayKey(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function cap(s){return s.charAt(0)+s.slice(1).toLowerCase()}
+function kcls(s){var a=s.sector==='SALIDA'?'S':s.sector==='ENTRADA'?'E':'';var t=/MEDIO|FIJO/.test(s.turno)?'ME':/MA[ÑN]ANA|^1/.test(s.turno)?'M':/TARDE|NOCHE|^2/.test(s.turno)?'T':'';return a&&t?'k-'+a+t:'k-NN'}
+function abs(s){return dObj(s.date).getTime()+s.start*60000}
+function absEnd(s){return dObj(s.date).getTime()+s.end*60000}
+function overlap(a,b){return Math.max(0,Math.min(a.end,b.end)-Math.max(a.start,b.start))}
+function isSup(r){return /SUPERV/i.test(r)}
+function tLabel(s){if(!s.turno)return '';return /TURNO/.test(s.turno)?cap(s.turno):'Turno '+s.turno.toLowerCase()}
+
+var grids=load(KEY_GRIDS,null);
+if(!grids||!grids.length){grids=PRELOADED?[Object.assign({loadedAt:0,preloaded:true},PRELOADED)]:[]}
+var me=load(KEY_ME,null), tab='me', dayPick=null, showPast=false;
+
+function data(){
+  var sorted=grids.slice().sort(function(a,b){return a.loadedAt-b.loadedAt});
+  var byDate={},people={};
+  var byPart={};
+  sorted.forEach(function(g){
+    var ds={};g.shifts.forEach(function(s){var k=s.date+'|'+(s.part||'dia');(ds[k]=ds[k]||[]).push(Object.assign({kind:g.kind||''},s))});
+    Object.keys(ds).forEach(function(k){byPart[k]=ds[k]});
+    g.people.forEach(function(p){people[p.name]=p});
+  });
+  Object.keys(byPart).forEach(function(k){var d=k.split('|')[0];byDate[d]=(byDate[d]||[]).concat(byPart[k])});
+  var days=Object.keys(byDate).sort();
+  return {byDate:byDate,days:days,people:Object.keys(people).sort().map(function(k){return people[k]})};
+}
+
+function showMsg(t,err){var m=document.getElementById('msg');m.innerHTML=t;m.className='msg'+(err?' err':'');m.hidden=!t}
+
+function renderWho(D){
+  var el=document.getElementById('who');
+  if(!D.people.length){el.innerHTML='<h2>Bienvenido</h2><p class="note" style="margin:0">Todavía no hay ninguna grilla en este teléfono. Cargá el PDF de la semana con el botón <b>Cargar PDF</b> y después elegí tu apellido.</p>';return false}
+  var p=me&&D.people.find(function(x){return x.name===me});
+  if(p){
+    el.innerHTML='<div class="me"><div class="grow"><div class="label">'+(isSup(p.role)?'Supervisor':'Inspector')+'</div><div class="nm">'+esc(p.name)+'</div>'+
+      (p.group?'<div class="sub">Grupo: '+esc(cap(p.group))+(p.groupSector?' · '+esc(cap(p.groupSector)):'')+'</div>':'')+
+      '</div><button class="btn btn-ghost" id="change">Cambiar</button></div>';
+    document.getElementById('change').onclick=function(){me=null;save(KEY_ME,null);render()};
+    return true;
+  }
+  var groupsH={};D.people.forEach(function(x){(groupsH[x.role]=groupsH[x.role]||[]).push(x)});
+  el.innerHTML='<h2>¿Quién sos?</h2><p class="note" style="margin:0">Tocá tu apellido. La app lo recuerda en este teléfono.</p>'+
+    Object.keys(groupsH).map(function(r){return '<div class="label">'+esc(cap(r))+'</div><div class="chips">'+
+      groupsH[r].map(function(x){return '<button class="chip" data-n="'+esc(x.name)+'">'+esc(x.name)+'</button>'}).join('')+'</div>'}).join('');
+  el.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){me=b.dataset.n;save(KEY_ME,me);tab='me';render();window.scrollTo(0,0)}});
+  return false;
+}
+
+function companions(s,list){
+  var sameSec=[],other=[],sups=[],relevo=[];
+  list.forEach(function(o){
+    if(o===s||o.name===s.name)return;
+    var ov=overlap(s,o);
+    var oSup=isSup(o.role), mSup=isSup(s.role);
+    if(o.sector===s.sector){
+      if(Math.abs(o.start-s.end)<=30&&ov<60&&o.start>s.start&&oSup===mSup)relevo.push({t:'Te releva',o:o,at:o.start});
+      else if(Math.abs(o.end-s.start)<=30&&ov<60&&o.start<s.start&&oSup===mSup)relevo.push({t:'Recibís de',o:o,at:s.start});
+    }
+    if(ov<60)return;
+    if(oSup&&!mSup){if(o.sector===s.sector)sups.push(o)}
+    else if(!oSup&&mSup){if(o.sector===s.sector)sameSec.push(o)}
+    else if(o.sector===s.sector)sameSec.push(o); else if(!mSup)other.push(o);
+  });
+  return {sameSec:sameSec,other:other,sups:sups,relevo:relevo};
+}
+function nmList(arr,showHrs){return arr.map(function(o){return esc(o.name)+(showHrs?' <i>'+hm(o.start)+'–'+hm(o.end)+'</i>':'')}).join(', ')}
+
+function dayCard(s,D,tk){
+  var c=companions(s,D.byDate[s.date]),d=dObj(s.date);
+  var mSup=isSup(s.role),rows=[];
+  if(c.sameSec.length)rows.push(['Con vos en '+cap(s.sector),nmList(c.sameSec,true)]);
+  if(c.sups.length)rows.push(['Supervisor',nmList(c.sups,true)]);
+  var rv={};c.relevo.forEach(function(r){(rv[r.t]=rv[r.t]||[]).push(esc(r.o.name)+' <i>'+hm(r.at)+'</i>')});
+  Object.keys(rv).forEach(function(t){rows.push([t,rv[t].join(', ')])});
+  if(c.other.length)rows.push(['En '+cap(s.sector==='SALIDA'?'ENTRADA':'SALIDA'),nmList(c.other,true)]);
+  if(mSup&&!c.sameSec.length&&!rows.length)rows.push(['Equipo','—']);
+  return '<article class="day'+(s.date<tk?' past':'')+(s.date===tk?' today':'')+'">'+
+    '<div class="day-h '+kcls(s)+'"><div class="date"><span class="dw">'+DW[d.getDay()]+'</span><span class="dn">'+d.getDate()+'</span></div>'+
+    '<div class="main"><div class="hrs">'+hm(s.start)+' a '+hm(s.end)+'</div><div class="tag">'+esc(s.sector)+(s.turno?' · '+esc(tLabel(s)):'')+(s.note?' · '+esc(s.note.toLowerCase()):'')+'</div></div></div>'+
+    '<div class="day-b">'+rows.map(function(r){return '<div class="row"><span>'+r[0]+'</span><span class="names">'+r[1]+'</span></div>'}).join('')+'</div></article>';
+}
+
+function relTime(ms){
+  var now=Date.now(),t=new Date(ms),tk=todayKey();
+  var k=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  var days=Math.round((dObj(k)-dObj(tk))/864e5);
+  if(days===0){var h=Math.floor((ms-now)/36e5),m=Math.round((ms-now)/6e4)%60;return 'Hoy, en '+(h?h+' h ':'')+m+' min'}
+  if(days===1)return 'Mañana';
+  return 'En '+days+' días · '+DWL[t.getDay()];
+}
+
+function renderMe(D){
+  var el=document.getElementById('view-me');
+  var mine=[];D.days.forEach(function(k){D.byDate[k].forEach(function(s){if(s.name===me)mine.push(s)})});
+  mine.sort(function(a,b){return abs(a)-abs(b)});
+  var tk=todayKey(),now=Date.now(),html='';
+  var cur=mine.find(function(s){return abs(s)<=now&&absEnd(s)>now});
+  var nxt=cur||mine.find(function(s){return abs(s)>now});
+  if(nxt){
+    var d=dObj(nxt.date),c=companions(nxt,D.byDate[nxt.date]);
+    var with_=c.sameSec.concat(c.sups);
+    html+='<div class="next"><div class="label">'+(cur?'Ahora':'Próximo turno')+'</div>'+
+      '<div class="when'+(cur?' live':'')+'">'+(cur?'Estás de turno hasta las '+hm(nxt.end):esc(relTime(abs(nxt))))+'</div>'+
+      '<div class="hrs">'+hm(nxt.start)+' a '+hm(nxt.end)+'</div>'+
+      '<div><b>'+esc(cap(DWL[d.getDay()]))+' '+dd(nxt.date)+'</b> · '+esc(cap(nxt.sector))+(nxt.turno?' · '+esc(tLabel(nxt).toLowerCase()):'')+'</div>'+
+      (with_.length?'<div class="note">Con '+with_.map(function(o){return esc(o.name)}).join(', ')+'</div>':'')+'</div>';
+  } else if(mine.length){
+    html+='<div class="msg">La grilla cargada ya terminó. Cargá el PDF de la semana nueva.</div>';
+  }
+  var past=mine.filter(function(s){return s.date<tk}),rest=mine.filter(function(s){return s.date>=tk});
+  if(past.length)html+='<button class="btn btn-ghost" id="pastBtn">'+(showPast?'Ocultar':'Ver')+' días anteriores ('+past.length+')</button>';
+  (showPast?past.concat(rest):rest).forEach(function(s){html+=dayCard(s,D,tk)});
+  if(!mine.length)html='<div class="msg">No aparecés en la grilla cargada.</div>';
+  el.innerHTML=html;
+  var pb=document.getElementById('pastBtn');if(pb)pb.onclick=function(){showPast=!showPast;renderMe(D)};
+}
+
+function renderDay(D){
+  var el=document.getElementById('view-day'),tk=todayKey();
+  if(!dayPick||!D.byDate[dayPick])dayPick=D.days.find(function(k){return k>=tk})||D.days[D.days.length-1];
+  var html='<div class="days">'+D.days.map(function(k){var d=dObj(k);return '<button data-k="'+k+'" aria-pressed="'+(k===dayPick)+'"><small>'+DW[d.getDay()]+'</small><b>'+d.getDate()+'</b><small>'+String(d.getMonth()+1).padStart(2,'0')+'</small></button>'}).join('')+'</div>';
+  var d=dObj(dayPick);
+  var kinds=(D.byDate[dayPick]||[]).map(function(x){return x.kind}).filter(function(x,i,a){return x&&a.indexOf(x)===i});
+  html+='<h2>'+esc(cap(DWL[d.getDay()]))+' '+dd(dayPick)+'</h2>'+(kinds.length?'<p class="note" style="margin:-10px 0 0">Grilla '+kinds.map(function(k){return esc(cap(k))}).join(' / ')+'</p>':'');
+  var list=D.byDate[dayPick]||[],secs={};
+  list.forEach(function(s){(secs[s.sector||'OTROS']=secs[s.sector||'OTROS']||[]).push(s)});
+  ['SALIDA','ENTRADA'].concat(Object.keys(secs).filter(function(k){return k!=='SALIDA'&&k!=='ENTRADA'})).forEach(function(sec){
+    if(!secs[sec])return;
+    var slots={};secs[sec].forEach(function(s){var k=s.part+'|'+s.start+'-'+s.end+'|'+s.turno;(slots[k]=slots[k]||{s:s,p:[]}).p.push(s)});
+    html+='<div class="sector"><div class="label">'+esc(sec)+'</div><div class="slots">'+
+      Object.keys(slots).sort(function(a,b){return slots[a].s.start-slots[b].s.start||slots[a].s.end-slots[b].s.end}).map(function(k){var o=slots[k];
+        o.p.sort(function(a,b){return isSup(a.role)-isSup(b.role)});
+        return '<div class="slot"><span class="sw '+kcls(o.s)+'"></span><div class="t">'+hm(o.s.start)+'–'+hm(o.s.end)+'<small>'+esc((o.s.part==='cierre'?'cierre · '+o.s.turno:o.s.turno).toLowerCase())+'</small></div><div class="p">'+
+          o.p.map(function(s){return '<span class="pn'+(isSup(s.role)?' sup':'')+(s.name===me?' mine':'')+'" title="'+(isSup(s.role)?'Supervisor':'Inspector')+'">'+esc(s.name)+'</span>'}).join('')+'</div></div>'}).join('')+'</div></div>';
+  });
+  html+='<p class="note">Borde punteado = supervisor.</p>';
+  el.innerHTML=html;
+  el.querySelectorAll('.days button').forEach(function(b){b.onclick=function(){dayPick=b.dataset.k;renderDay(D)}});
+  var sel=el.querySelector('.days button[aria-pressed="true"]');if(sel)sel.scrollIntoView({block:'nearest',inline:'center'});
+}
+
+function renderLoaded(){
+  var el=document.getElementById('loaded');
+  if(!grids.length){el.innerHTML='';return}
+  var gs=grids.slice().sort(function(a,b){return b.days[0]<a.days[0]?-1:1});
+  el.innerHTML='<div class="label">Grillas en este teléfono</div><ul>'+gs.map(function(g){
+    var p=g.period?String(g.period.from.d).padStart(2,'0')+'/'+String(g.period.from.m).padStart(2,'0')+' '+g.period.from.t+' al '+String(g.period.to.d).padStart(2,'0')+'/'+String(g.period.to.m).padStart(2,'0')+' '+g.period.to.t:dd(g.days[0])+' al '+dd(g.days[g.days.length-1]);
+    return '<li><span><b>'+esc(p)+'</b>'+(g.kind?' · '+esc(cap(g.kind)):'')+'<br><span class="note">'+(g.preloaded?'Incluida en la app':'Cargada '+new Date(g.loadedAt).toLocaleDateString('es-AR'))+' · '+g.shifts.length+' turnos</span></span>'+(grids.length>1?'<button data-id="'+esc(g.id)+'">Quitar</button>':'')+'</li>'}).join('')+'</ul>';
+  el.querySelectorAll('button[data-id]').forEach(function(b){b.onclick=function(){grids=grids.filter(function(g){return g.id!==b.dataset.id});save(KEY_GRIDS,grids);render()}});
+}
+
+function render(){
+  var D=data(),known=renderWho(D);
+  document.getElementById('tabs').hidden=!known;
+  document.getElementById('tab-me').setAttribute('aria-selected',tab==='me');
+  document.getElementById('tab-day').setAttribute('aria-selected',tab==='day');
+  document.getElementById('view-me').hidden=!known||tab!=='me';
+  document.getElementById('view-day').hidden=!known||tab!=='day';
+  if(known){if(tab==='me')renderMe(D);else renderDay(D)}
+  renderLoaded();
+}
+document.getElementById('tab-me').onclick=function(){tab='me';render()};
+document.getElementById('tab-day').onclick=function(){tab='day';render()};
+
+async function readPdf(file){
+  if(!window.pdfjsLib){showMsg('No se pudo cargar el lector de PDF. Revisá la conexión y volvé a abrir la app.',true);return}
+  if(!/pdf/i.test(file.type)&&!/\.pdf$/i.test(file.name)){showMsg('Ese archivo no es un PDF. Elegí el PDF de la grilla.',true);return}
+  showMsg('Leyendo '+esc(file.name)+'…');
+  try{
+    var buf=new Uint8Array(await file.arrayBuffer());
+    var doc=await pdfjsLib.getDocument({data:buf,verbosity:0,isEvalSupported:false}).promise;
+    var raw=[];
+    for(var p=1;p<=doc.numPages;p++){
+      var pg=await doc.getPage(p),vp=pg.getViewport({scale:1}),tc=await pg.getTextContent();
+      tc.items.forEach(function(it){if(it.str)raw.push({s:it.str,x:it.transform[4],y:vp.height-it.transform[5]+(p-1)*10000,w:it.width})});
+    }
+    var g=GrillaParser.parse(raw);
+    g.loadedAt=Date.now();
+    grids=grids.filter(function(x){return x.id!==g.id});
+    grids.push(g);
+    grids.sort(function(a,b){return b.loadedAt-a.loadedAt});grids=grids.slice(0,8);
+    save(KEY_GRIDS,grids);
+    if(me&&!g.people.some(function(x){return x.name===me}))showMsg('Grilla cargada: '+dd(g.days[0])+' al '+dd(g.days[g.days.length-1])+'. Tu apellido no aparece en esta grilla.',true);
+    else showMsg('Listo. Grilla '+(g.kind?'<b>'+esc(cap(g.kind))+'</b> ':'')+'del '+dd(g.days[0])+' al '+dd(g.days[g.days.length-1])+' cargada ('+g.shifts.length+' turnos).');
+    dayPick=null;render();window.scrollTo(0,0);
+  }catch(e){
+    showMsg('No pude leer ese PDF como grilla del Paso San Sebastián. Asegurate de elegir el PDF que genera la app de grillas. <span class="note">('+esc(e.message||e)+')</span>',true);
+  }
+}
+var fi=document.getElementById('file');
+fi.onchange=function(){if(fi.files[0])readPdf(fi.files[0]);fi.value=''};
+var ov=document.getElementById('overlay'),dc=0;
+addEventListener('dragenter',function(e){if(e.dataTransfer&&Array.prototype.indexOf.call(e.dataTransfer.types,'Files')>=0){dc++;ov.hidden=false}});
+addEventListener('dragleave',function(){if(--dc<=0){dc=0;ov.hidden=true}});
+addEventListener('dragover',function(e){e.preventDefault()});
+addEventListener('drop',function(e){e.preventDefault();dc=0;ov.hidden=true;var f=e.dataTransfer.files[0];if(f)readPdf(f)});
+addEventListener('paste',function(e){var f=e.clipboardData&&e.clipboardData.files[0];if(f){e.preventDefault();readPdf(f)}});
+window.__readPdf=readPdf;
+render();
+})();
+</script>
+<script>
+(function(){
+  var KEY_TIP='grillaSS.installTip';
+  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}}
+  var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  var main=document.querySelector('main');
+  function banner(html,onInstall){
+    if(standalone||store(KEY_TIP)==='no')return;
+    var old=document.getElementById('install');if(old)old.remove();
+    var d=document.createElement('div');d.className='install';d.id='install';
+    d.innerHTML='<p>'+html+'</p>'+(onInstall?'<button class="btn btn-primary" id="doInstall">Instalar</button>':'')+'<button class="x" aria-label="Cerrar">×</button>';
+    main.insertBefore(d,main.firstChild);
+    d.querySelector('.x').onclick=function(){store(KEY_TIP,'no');d.remove()};
+    if(onInstall)d.querySelector('#doInstall').onclick=onInstall;
+  }
+  var deferred=null;
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault();deferred=e;
+    banner('<b>Instalá la app</b> en este teléfono para usarla sin conexión.',function(){
+      deferred.prompt();deferred.userChoice.then(function(){deferred=null;var b=document.getElementById('install');if(b)b.remove()});
+    });
+  });
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!standalone){
+    banner('<b>Para instalarla en iPhone:</b> abrila en Safari, tocá el botón Compartir (el cuadrado con la flecha) y elegí <b>Agregar a inicio</b>.');
+  }
+  // estado sin conexión
+  var brand=document.querySelector('.brand b');
+  function net(){var t=document.getElementById('offTag');if(!navigator.onLine){if(!t){t=document.createElement('span');t.id='offTag';t.className='offline';t.textContent='Sin conexión';brand.after(t)}}else if(t)t.remove()}
+  addEventListener('online',net);addEventListener('offline',net);net();
+  // PDF compartido desde otra app (Android: Compartir → Mi Turno SS)
+  if(/[?&]shared=1/.test(location.search)&&'caches' in window){
+    caches.open('share-inbox').then(function(c){return c.match('shared.pdf').then(function(r){
+      if(!r)return;
+      var name=decodeURIComponent(r.headers.get('x-name')||'grilla.pdf');
+      return r.blob().then(function(b){c.delete('shared.pdf');window.__readPdf(new File([b],name,{type:'application/pdf'}))});
+    })}).finally(function(){history.replaceState(null,'',location.pathname)});
+  }
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+})();
+</script>
+
+
+</body>
+</html>
