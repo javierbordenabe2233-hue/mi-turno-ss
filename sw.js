@@ -1,5 +1,5 @@
 // Mi Turno SS: guarda la app en el teléfono para que funcione sin conexión.
-const VERSION = 'mi-turno-v1';
+const VERSION = 'mi-turno-v2';
 const ASSETS = ['./', './index.html', './pdf.min.js', './pdf.worker.min.js', './manifest.webmanifest',
   './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 

@@ -7,7 +7,7 @@
 <title>Grilla San Sebastián</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1d55c9">
+<meta name="theme-color" content="#2a2d2f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mi Turno SS">
@@ -18,132 +18,149 @@
 .install{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px}
 .install p{margin:0;flex:1;min-width:0;font-size:15px}
 .install .x{border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;padding:4px 8px;cursor:pointer}
-.offline{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent-ink);color:var(--accent);border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+.offline{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--sign);color:var(--sign-ink);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;700;800;900&family=Overpass+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: una columna tipo cartel de ruta; barra azul arriba, tarjetas por día con el color de fila de la grilla */
+/* Layout: una columna como un tramo de Ruta 3. Encabezado = cartel verde vial sobre asfalto con línea amarilla;
+   tarjetas por día con mojón (fecha) y franja del color de turno de la grilla. */
 :root{
-  --bg:#eef1f5; --surface:#ffffff; --ink:#0f1b2d; --muted:#5a6678; --line:#d6dce5;
-  --accent:#1d55c9; --accent-ink:#ffffff; --accent-soft:#e3ebfb;
-  --sm:#fde59a; --st:#a6d39a; --eme:#f7a23c; --em:#a9c4f5; --et:#f4c9cb; --nn:#e2e6ec;
-  --cell-ink:#1a2333; --now:#0f8a4f;
-  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg:#e7e2d3; --surface:#f8f5ec; --ink:#1d221c; --muted:#686657; --line:#d2cab4;
+  --accent:#0d6b3c; --accent-ink:#ffffff; --accent-soft:#d6e6d8;
+  --sign:#f2b705; --sign-ink:#1d221c; --asphalt:#2a2d2f;
+  --sm:#f3d36a; --st:#b6c98c; --eme:#e59b55; --em:#a8c5d2; --et:#e2b2a0; --nn:#d9d3c2;
+  --cell-ink:#1d221c; --now:#0d6b3c;
+  --display:"Overpass","Arial Narrow",Arial,sans-serif;
+  --body:"Overpass",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Overpass Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0b111c; --surface:#131c2b; --ink:#e7edf6; --muted:#97a3b6; --line:#263247;
-  --accent:#6f9dff; --accent-ink:#0b111c; --accent-soft:#1a2a4a;
-  --sm:#5c4b14; --st:#2f5a2a; --eme:#7a4510; --em:#22406f; --et:#6a3236; --nn:#2a3343;
-  --cell-ink:#eef2f8; --now:#4fd18f; color-scheme:dark}}
+  --bg:#141615; --surface:#1e2120; --ink:#ece6d6; --muted:#a19c89; --line:#323634;
+  --accent:#3fa66a; --accent-ink:#0f1210; --accent-soft:#1d3326;
+  --sign:#f2c230; --sign-ink:#141615; --asphalt:#0d0f0e;
+  --sm:#5e4c12; --st:#3a4a25; --eme:#6e3f16; --em:#24404c; --et:#5a3027; --nn:#2b2e2c;
+  --cell-ink:#f1ece0; --now:#5fd08d; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0b111c; --surface:#131c2b; --ink:#e7edf6; --muted:#97a3b6; --line:#263247;
-  --accent:#6f9dff; --accent-ink:#0b111c; --accent-soft:#1a2a4a;
-  --sm:#5c4b14; --st:#2f5a2a; --eme:#7a4510; --em:#22406f; --et:#6a3236; --nn:#2a3343;
-  --cell-ink:#eef2f8; --now:#4fd18f; color-scheme:dark}
+  --bg:#141615; --surface:#1e2120; --ink:#ece6d6; --muted:#a19c89; --line:#323634;
+  --accent:#3fa66a; --accent-ink:#0f1210; --accent-soft:#1d3326;
+  --sign:#f2c230; --sign-ink:#141615; --asphalt:#0d0f0e;
+  --sm:#5e4c12; --st:#3a4a25; --eme:#6e3f16; --em:#24404c; --et:#5a3027; --nn:#2b2e2c;
+  --cell-ink:#f1ece0; --now:#5fd08d; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--accent)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--asphalt)}
 .wrap{max-width:680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 button,label.btn{font:inherit;cursor:pointer}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+:focus-visible{outline:3px solid var(--sign);outline-offset:2px}
 
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--accent);color:var(--accent-ink)}
-.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
-.brand{flex:1;min-width:0}
-.brand small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
-.brand b{font-family:var(--display);font-size:24px;letter-spacing:.02em;line-height:1.05;text-transform:uppercase}
-.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:8px;padding:10px 14px;font-weight:600;font-size:15px}
-.btn-load{background:var(--accent-ink);color:var(--accent)}
+/* encabezado: cartel vial sobre asfalto */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--asphalt);color:#fff}
+.bar::after{content:"";display:block;height:4px;background:repeating-linear-gradient(90deg,var(--sign) 0 28px,transparent 28px 46px)}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px 8px}
+.brand{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:#0d6b3c;border:2px solid #fff;border-radius:7px;padding:6px 10px;box-shadow:0 0 0 2px #0d6b3c}
+.shield{flex:none;display:grid;place-items:center;width:34px;height:34px;background:#fff;color:#1d221c;border-radius:6px 6px 14px 14px;font-family:var(--display);font-weight:900;font-size:17px;line-height:1}
+.shield small{display:block;font-size:7px;letter-spacing:.06em;font-weight:800}
+.brand .txt{min-width:0}
+.brand .txt small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;opacity:.9}
+.brand b{display:block;font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:.02em;line-height:1.25;padding-top:2px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:8px;padding:10px 14px;font-weight:700;font-size:15px}
+.btn-load{background:var(--sign);color:var(--sign-ink);flex:none}
 .btn-ghost{background:transparent;color:var(--accent);border:1.5px solid var(--line)}
 .btn-primary{background:var(--accent);color:var(--accent-ink)}
 .btn svg{width:18px;height:18px;flex:none}
+@media (max-width:400px){.btn-load .lbl-long{display:none}.brand .txt small{font-size:10px}}
 
 main.wrap{display:flex;flex-direction:column;gap:18px;padding-block:18px 40px}
-.msg{border-radius:10px;padding:12px 14px;background:var(--accent-soft);font-size:15px}
-.msg.err{background:var(--et);color:var(--cell-ink)}
+.msg{border-radius:8px;padding:12px 14px;background:var(--accent-soft);font-size:15px;border-left:5px solid var(--accent)}
+.msg.err{background:var(--et);color:var(--cell-ink);border-left-color:var(--sign)}
 .msg[hidden]{display:none}
 
-h2{font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.06em;margin:0;text-wrap:balance}
-.label{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
+h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.05em;margin:0;text-wrap:balance}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:700}
 
 /* quién sos */
 .who{display:flex;flex-direction:column;gap:14px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px}
-.chip:hover{border-color:var(--accent)}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:9px 14px;font-weight:700;font-size:15px;letter-spacing:.02em}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
 .me{display:flex;align-items:center;gap:12px}
-.me .nm{font-family:var(--display);font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.me .nm{font-family:var(--display);font-weight:900;font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
 .me .sub{color:var(--muted);font-size:14px}
 .me .grow{flex:1;min-width:0}
 
 /* tabs */
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:4px;gap:4px}
-.tabs button{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:7px;font-weight:700;font-size:15px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:5px;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.06em}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 
-/* turnos */
-.next{background:var(--surface);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px;border:1.5px solid var(--line)}
-.next .when{font-weight:700;color:var(--accent)}
+/* próximo turno: cartel amarillo de aviso */
+.next{background:var(--surface);border-radius:10px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;border:2px solid var(--sign);position:relative;overflow:hidden}
+.next::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:repeating-linear-gradient(-45deg,var(--sign) 0 10px,var(--asphalt) 10px 20px)}
+.next .label{margin-top:4px;display:flex;align-items:center;gap:8px}
+.next .label::before{content:"";width:10px;height:10px;background:var(--sign);display:inline-block}
+.next .when{font-weight:800;color:var(--accent)}
 .next .when.live{color:var(--now)}
-.next .hrs{font-family:var(--display);font-size:46px;line-height:1;letter-spacing:.01em}
+.next .hrs{font-family:var(--mono);font-weight:700;font-size:42px;line-height:1;letter-spacing:-.02em}
 .list{display:flex;flex-direction:column;gap:12px}
-.day{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.day{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
 .day.past{opacity:.6}
-.day.today{border-color:var(--accent)}
-.day-h{display:flex;align-items:center;gap:12px;padding:12px 14px;color:var(--cell-ink)}
-.date{display:flex;flex-direction:column;align-items:center;width:46px;flex:none}
-.date .dw{font-size:12px;font-weight:700;letter-spacing:.1em}
-.date .dn{font-family:var(--display);font-size:30px;line-height:1}
+.day.today{border-color:var(--sign);box-shadow:0 0 0 2px var(--sign)}
+.day-h{display:flex;align-items:center;gap:12px;padding:10px 14px;color:var(--cell-ink)}
+/* mojón kilométrico */
+.date{display:flex;flex-direction:column;align-items:stretch;width:50px;flex:none;background:#fff;color:#1d221c;border-radius:12px 12px 4px 4px;border:2px solid #1d221c;overflow:hidden;text-align:center}
+.date .dw{display:block;background:#1d221c;color:#fff;font-size:10px;font-weight:800;letter-spacing:.1em;line-height:1;padding:5px 0 3px}
+.date .dn{display:block;font-family:var(--display);font-weight:900;font-size:24px;line-height:1;padding:5px 0 4px}
 .day-h .main{flex:1;min-width:0}
-.day-h .hrs{font-family:var(--display);font-size:26px;line-height:1.05}
-.day-h .tag{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.day-h .hrs{font-family:var(--mono);font-weight:700;font-size:24px;line-height:1.1;letter-spacing:-.02em}
+.day-h .tag{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .day-b{padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:15px}
 .row{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:baseline}
-.row > span:first-child{color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-.names{font-weight:700;min-width:0}
-.names i{font-style:normal;font-weight:500;color:var(--muted)}
+.row > span:first-child{color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.names{font-weight:800;min-width:0}
+.names i{font-style:normal;font-weight:500;color:var(--muted);font-family:var(--mono);font-size:13px}
 .k-SM{background:var(--sm)} .k-ST{background:var(--st)} .k-EME{background:var(--eme)} .k-EM{background:var(--em)} .k-ET{background:var(--et)} .k-NN{background:var(--nn)}
 .free{padding:12px 14px;color:var(--muted);display:flex;gap:12px;align-items:center}
 
 /* por día */
 .days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
-.days button{flex:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;min-width:56px}
-.days button b{font-family:var(--display);font-size:22px;line-height:1}
-.days button small{font-size:11px;font-weight:700;letter-spacing:.08em}
+.days button{flex:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;min-width:56px}
+.days button b{font-family:var(--display);font-weight:900;font-size:22px;line-height:1}
+.days button small{font-size:11px;font-weight:800;letter-spacing:.08em}
 .days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .sector{display:flex;flex-direction:column;gap:8px}
-.slots{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.sector > .label{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.sector > .label::before{content:"▸";color:var(--accent);font-size:14px}
+.slots{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
 .slot{display:grid;grid-template-columns:8px 112px 1fr;align-items:center;border-top:1px solid var(--line)}
 .slot:first-child{border-top:0}
 .slot .sw{align-self:stretch}
-.slot .t{padding:10px 0 10px 12px;font-weight:700}
-.slot .t small{display:block;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.slot .t{padding:10px 0 10px 12px;font-family:var(--mono);font-weight:700;font-size:15px}
+.slot .t small{display:block;font-family:var(--body);font-weight:700;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .slot .p{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
-.pn{font-weight:700;padding:3px 9px;border-radius:6px;background:var(--bg)}
+.pn{font-weight:800;padding:3px 9px;border-radius:5px;background:var(--bg)}
 .pn.sup{border:1.5px dashed var(--muted)}
-.pn.mine{background:var(--accent);color:var(--accent-ink)}
+.pn.mine{background:var(--sign);color:var(--sign-ink)}
 
 /* pie */
-.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
 .drop p{margin:0;color:var(--muted);max-width:44ch}
 .loaded{display:flex;flex-direction:column;gap:6px}
 .loaded li{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
 .loaded ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .loaded li span{flex:1;min-width:0}
-.loaded li button{border:0;background:transparent;color:var(--muted);font-weight:600;padding:4px 6px}
+.loaded li button{border:0;background:transparent;color:var(--muted);font-weight:700;padding:4px 6px}
 .note{font-size:13px;color:var(--muted)}
-.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--accent) 85%,transparent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-size:32px;text-transform:uppercase;z-index:20}
-@media (max-width:420px){.row{grid-template-columns:1fr;gap:0}.slot{grid-template-columns:8px 96px 1fr}.next .hrs{font-size:40px}}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--accent) 88%,transparent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:32px;text-transform:uppercase;z-index:20}
+@media (max-width:420px){.row{grid-template-columns:1fr;gap:0}.slot{grid-template-columns:8px 96px 1fr}.next .hrs{font-size:36px}}
 @media (prefers-reduced-motion:no-preference){.tabs button,.chip,.days button{transition:background .15s,border-color .15s,color .15s}}
 </style>
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <div class="brand"><small>Paso fronterizo · Ruta 3</small><b>San Sebastián</b></div>
-  <label class="btn btn-load" for="file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Cargar PDF</label>
+  <div class="brand"><span class="shield" aria-hidden="true"><span><small>RN</small>3</span></span><span class="txt"><small>Paso fronterizo</small><b>San Sebastián</b></span></div>
+  <label class="btn btn-load" for="file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Cargar<span class="lbl-long">&nbsp;PDF</span></label>
   <input id="file" type="file" accept="application/pdf,.pdf" hidden>
 </div></header>
 
@@ -594,7 +611,7 @@ render();
     banner('<b>Para instalarla en iPhone:</b> abrila en Safari, tocá el botón Compartir (el cuadrado con la flecha) y elegí <b>Agregar a inicio</b>.');
   }
   // estado sin conexión
-  var brand=document.querySelector('.brand b');
+  var brand=document.querySelector('.brand .txt small');
   function net(){var t=document.getElementById('offTag');if(!navigator.onLine){if(!t){t=document.createElement('span');t.id='offTag';t.className='offline';t.textContent='Sin conexión';brand.after(t)}}else if(t)t.remove()}
   addEventListener('online',net);addEventListener('offline',net);net();
   // PDF compartido desde otra app (Android: Compartir → Mi Turno SS)
