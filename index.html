@@ -32,6 +32,8 @@
   --sign:#f2b705; --sign-ink:#1d221c; --asphalt:#2a2d2f;
   --sm:#f3d36a; --st:#b6c98c; --eme:#e59b55; --em:#a8c5d2; --et:#e2b2a0; --nn:#d9d3c2;
   --cell-ink:#1d221c; --now:#0d6b3c;
+  --insp:#d3ead6; --insp-ink:#14432a; --insp-strong:#1b7f45; --insp-strong-ink:#ffffff;
+  --sup:#fbdcbf; --sup-ink:#6b3410; --sup-strong:#d4691a; --sup-strong-ink:#ffffff;
   --display:"Overpass","Arial Narrow",Arial,sans-serif;
   --body:"Overpass",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"Overpass Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
@@ -41,12 +43,16 @@
   --accent:#3fa66a; --accent-ink:#0f1210; --accent-soft:#1d3326;
   --sign:#f2c230; --sign-ink:#141615; --asphalt:#0d0f0e;
   --sm:#5e4c12; --st:#3a4a25; --eme:#6e3f16; --em:#24404c; --et:#5a3027; --nn:#2b2e2c;
+  --insp:#1f3a28; --insp-ink:#cdeccf; --insp-strong:#46b574; --insp-strong-ink:#0f1210;
+  --sup:#4a2e17; --sup-ink:#f7d3b0; --sup-strong:#f0913a; --sup-strong-ink:#0f1210;
   --cell-ink:#f1ece0; --now:#5fd08d; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141615; --surface:#1e2120; --ink:#ece6d6; --muted:#a19c89; --line:#323634;
   --accent:#3fa66a; --accent-ink:#0f1210; --accent-soft:#1d3326;
   --sign:#f2c230; --sign-ink:#141615; --asphalt:#0d0f0e;
   --sm:#5e4c12; --st:#3a4a25; --eme:#6e3f16; --em:#24404c; --et:#5a3027; --nn:#2b2e2c;
+  --insp:#1f3a28; --insp-ink:#cdeccf; --insp-strong:#46b574; --insp-strong-ink:#0f1210;
+  --sup:#4a2e17; --sup-ink:#f7d3b0; --sup-strong:#f0913a; --sup-strong-ink:#0f1210;
   --cell-ink:#f1ece0; --now:#5fd08d; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums}
@@ -139,9 +145,12 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
 .slot .t{padding:10px 0 10px 12px;font-family:var(--mono);font-weight:700;font-size:15px}
 .slot .t small{display:block;font-family:var(--body);font-weight:700;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .slot .p{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
-.pn{font-weight:800;padding:3px 9px;border-radius:5px;background:var(--bg)}
-.pn.sup{border:1.5px dashed var(--muted)}
-.pn.mine{background:var(--sign);color:var(--sign-ink)}
+.pn{font-weight:800;padding:3px 9px;border-radius:5px;background:var(--insp);color:var(--insp-ink)}
+.pn.sup{background:var(--sup);color:var(--sup-ink)}
+.pn.mine{background:var(--insp-strong);color:var(--insp-strong-ink);box-shadow:0 0 0 2px var(--insp-strong)}
+.pn.sup.mine{background:var(--sup-strong);color:var(--sup-strong-ink);box-shadow:0 0 0 2px var(--sup-strong)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.legend .pn{font-size:12px;padding:2px 8px}
 
 /* pie */
 .drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
@@ -514,7 +523,7 @@ function renderDay(D){
         return '<div class="slot"><span class="sw '+kcls(o.s)+'"></span><div class="t">'+hm(o.s.start)+'–'+hm(o.s.end)+'<small>'+esc((o.s.part==='cierre'?'cierre · '+o.s.turno:o.s.turno).toLowerCase())+'</small></div><div class="p">'+
           o.p.map(function(s){return '<span class="pn'+(isSup(s.role)?' sup':'')+(s.name===me?' mine':'')+'" title="'+(isSup(s.role)?'Supervisor':'Inspector')+'">'+esc(s.name)+'</span>'}).join('')+'</div></div>'}).join('')+'</div></div>';
   });
-  html+='<p class="note">Borde punteado = supervisor.</p>';
+  html+='<div class="legend"><span class="pn">Inspector</span><span class="pn sup">Supervisor</span><span>Tu apellido aparece en color más fuerte.</span></div>';
   el.innerHTML=html;
   el.querySelectorAll('.days button').forEach(function(b){b.onclick=function(){dayPick=b.dataset.k;renderDay(D)}});
   var sel=el.querySelector('.days button[aria-pressed="true"]');if(sel)sel.scrollIntoView({block:'nearest',inline:'center'});
