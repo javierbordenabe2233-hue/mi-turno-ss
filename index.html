@@ -173,11 +173,6 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
   </div>
   <section id="view-me" class="list"></section>
   <section id="view-day" class="list" hidden></section>
-  <section class="drop" id="dropzone">
-    <h2>Grilla nueva</h2>
-    <p>Cuando te llegue el PDF de la semana, tocá <b>Cargar PDF</b> y elegilo. También podés arrastrarlo o pegarlo acá. Se lee en tu teléfono y no se sube a ningún lado.</p>
-    <label class="btn btn-primary" for="file">Elegir PDF de la grilla</label>
-  </section>
   <section class="loaded" id="loaded"></section>
 </main>
 <div id="overlay" class="overlay" hidden>Soltá el PDF</div>
@@ -415,7 +410,7 @@ function showMsg(t,err){var m=document.getElementById('msg');m.innerHTML=t;m.cla
 
 function renderWho(D){
   var el=document.getElementById('who');
-  if(!D.people.length){el.innerHTML='<h2>Bienvenido</h2><p class="note" style="margin:0">Todavía no hay ninguna grilla en este teléfono. Cargá el PDF de la semana con el botón <b>Cargar PDF</b> y después elegí tu apellido.</p>';return false}
+  if(!D.people.length){el.innerHTML='<h2>Bienvenido</h2><p class="note" style="margin:0">Todavía no hay ninguna grilla en este teléfono. Cargá el PDF de la semana con el botón amarillo <b>Cargar</b> de arriba y después elegí tu apellido.</p>';return false}
   var p=me&&D.people.find(function(x){return x.name===me});
   if(p){
     el.innerHTML='<div class="me"><div class="grow"><div class="label">'+(isSup(p.role)?'Supervisor':'Inspector')+'</div><div class="nm">'+esc(p.name)+'</div>'+
