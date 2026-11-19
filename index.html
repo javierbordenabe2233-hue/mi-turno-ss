@@ -8,6 +8,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2a2d2f">
+<script>try{if(localStorage.getItem('grillaSS.palette')==='migra')document.documentElement.setAttribute('data-palette','migra')}catch(e){}</script>
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mi Turno SS">
@@ -65,7 +67,7 @@ button,label.btn{font:inherit;cursor:pointer}
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--asphalt);color:#fff}
 .bar::after{content:"";display:block;height:4px;background:repeating-linear-gradient(90deg,var(--sign) 0 28px,transparent 28px 46px)}
 .bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px 8px}
-.brand{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:#0d6b3c;border:2px solid #fff;border-radius:7px;padding:6px 10px;box-shadow:0 0 0 2px #0d6b3c}
+.brand{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:var(--brand,#0d6b3c);color:var(--brand-ink,#fff);border:2px solid #fff;border-radius:7px;padding:6px 10px;box-shadow:0 0 0 2px var(--brand,#0d6b3c)}
 .shield{flex:none;display:grid;place-items:center;width:34px;height:34px;background:#fff;color:#1d221c;border-radius:6px 6px 14px 14px;font-family:var(--display);font-weight:900;font-size:17px;line-height:1}
 .shield small{display:block;font-size:7px;letter-spacing:.06em;font-weight:800}
 .brand .txt{min-width:0}
@@ -173,6 +175,42 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
 .next .btn-alarm.done{background:transparent;color:var(--accent)}
 .alarm-all{align-self:stretch;justify-content:center;padding:11px 14px;font-size:14px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 32px));background:var(--asphalt);color:#fff;border-left:5px solid var(--sign);border-radius:8px;padding:12px 14px;font-size:14px;z-index:30;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+
+/* Paleta Migraciones: azul marino #242C4F, celeste argentina #37BBED y amarillo #E7BA61 (sistema Poncho) */
+:root[data-palette="migra"]{
+  --bg:#eaf0f6; --surface:#ffffff; --ink:#242C4F; --muted:#5a6480; --line:#d2dbe7;
+  --accent:#242C4F; --accent-ink:#ffffff; --accent-soft:#e1f3fc;
+  --sign:#37BBED; --sign-ink:#242C4F; --asphalt:#242C4F;
+  --brand:#37BBED; --brand-ink:#242C4F; --now:#0277bd;
+  --insp:#e1f3fc; --insp-ink:#242C4F; --insp-strong:#242C4F; --insp-strong-ink:#ffffff;
+  --sup:#fbefd6; --sup-ink:#5e4300; --sup-strong:#E7BA61; --sup-strong-ink:#242C4F;}
+@media (prefers-color-scheme: dark){:root[data-palette="migra"]:not([data-theme="light"]){
+  --bg:#10152a; --surface:#1a2142; --ink:#e7eef8; --muted:#9ba7c2; --line:#2c3660;
+  --accent:#37BBED; --accent-ink:#10152a; --accent-soft:#1c2d55;
+  --sign:#37BBED; --sign-ink:#10152a; --asphalt:#0a0e1f;
+  --brand:#37BBED; --brand-ink:#10152a; --now:#68CEF3;
+  --insp:#1c2d55; --insp-ink:#d6eefb; --insp-strong:#37BBED; --insp-strong-ink:#10152a;
+  --sup:#3d3220; --sup-ink:#f5dfae; --sup-strong:#E7BA61; --sup-strong-ink:#10152a; color-scheme:dark;}}
+:root[data-palette="migra"][data-theme="dark"]{
+  --bg:#10152a; --surface:#1a2142; --ink:#e7eef8; --muted:#9ba7c2; --line:#2c3660;
+  --accent:#37BBED; --accent-ink:#10152a; --accent-soft:#1c2d55;
+  --sign:#37BBED; --sign-ink:#10152a; --asphalt:#0a0e1f;
+  --brand:#37BBED; --brand-ink:#10152a; --now:#68CEF3;
+  --insp:#1c2d55; --insp-ink:#d6eefb; --insp-strong:#37BBED; --insp-strong-ink:#10152a;
+  --sup:#3d3220; --sup-ink:#f5dfae; --sup-strong:#E7BA61; --sup-strong-ink:#10152a; color-scheme:dark;}
+:root[data-palette="migra"] .shield{color:#242C4F}
+:root[data-palette="migra"] .pal-btn{border-color:var(--sign)}
+/* selector de paleta */
+.pal-btn{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:25;width:48px;height:48px;border-radius:50%;border:2px solid var(--surface);background:var(--asphalt);color:#fff;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;padding:0}
+.pal-btn svg{width:24px;height:24px}
+.pal-menu{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:26;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:4px;min-width:210px}
+.pal-menu .label{padding:4px 8px 2px}
+.pal-opt{display:flex;align-items:center;gap:10px;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:700;font-size:15px;padding:9px 8px;border-radius:8px;text-align:left;cursor:pointer}
+.pal-opt[aria-checked="true"]{background:var(--accent-soft)}
+.pal-opt .sw3{display:flex;flex:none}
+.pal-opt .sw3 i{width:16px;height:22px;display:block}
+.pal-opt .sw3 i:first-child{border-radius:5px 0 0 5px} .pal-opt .sw3 i:last-child{border-radius:0 5px 5px 0}
+main.wrap{padding-bottom:84px}
 </style>
 </head>
 <body>
@@ -196,6 +234,32 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
 </main>
 <div id="overlay" class="overlay" hidden>Soltá el PDF</div>
 <div id="toast" class="toast" role="status" hidden></div>
+<button class="pal-btn" id="palBtn" aria-label="Cambiar colores" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="11" cy="7" r="1.2" fill="currentColor"/><circle cx="15.5" cy="7.8" r="1.2" fill="currentColor"/></svg></button>
+<div class="pal-menu" id="palMenu" role="menu" hidden>
+  <div class="label">Colores</div>
+  <button class="pal-opt" role="menuitemradio" data-pal="ruta"><span class="sw3"><i style="background:#2a2d2f"></i><i style="background:#0d6b3c"></i><i style="background:#f2b705"></i></span>Ruta 3</button>
+  <button class="pal-opt" role="menuitemradio" data-pal="migra"><span class="sw3"><i style="background:#242C4F"></i><i style="background:#37BBED"></i><i style="background:#E7BA61"></i></span>Migraciones</button>
+</div>
+<script>
+(function(){
+  var KEY='grillaSS.palette',root=document.documentElement,btn=document.getElementById('palBtn'),menu=document.getElementById('palMenu');
+  var meta=document.querySelector('meta[name="theme-color"]');
+  function cur(){return root.getAttribute('data-palette')==='migra'?'migra':'ruta'}
+  function apply(p){
+    if(p==='migra')root.setAttribute('data-palette','migra');else root.removeAttribute('data-palette');
+    try{localStorage.setItem(KEY,p)}catch(e){}
+    if(meta)meta.setAttribute('content',p==='migra'?'#242C4F':'#2a2d2f');
+    menu.querySelectorAll('.pal-opt').forEach(function(o){o.setAttribute('aria-checked',o.dataset.pal===p)});
+  }
+  function open(v){menu.hidden=!v;btn.setAttribute('aria-expanded',v)}
+  btn.onclick=function(e){e.stopPropagation();open(menu.hidden)};
+  menu.querySelectorAll('.pal-opt').forEach(function(o){o.onclick=function(){apply(o.dataset.pal);open(false)}});
+  document.addEventListener('click',function(e){if(!menu.hidden&&!menu.contains(e.target))open(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false)});
+  apply(cur());
+})();
+</script>
+
 
 <script src="pdf.min.js"></script>
 <script>pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";</script>
