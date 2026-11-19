@@ -161,6 +161,7 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
 .loaded li span{flex:1;min-width:0}
 .loaded li button{border:0;background:transparent;color:var(--muted);font-weight:700;padding:4px 6px}
 .note{font-size:13px;color:var(--muted)}
+.disclaimer{margin:0;font-size:13px;line-height:1.4;color:var(--ink);background:var(--surface);border:1.5px solid var(--sign);border-left-width:5px;border-radius:8px;padding:10px 12px}
 .overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--accent) 88%,transparent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:32px;text-transform:uppercase;z-index:20}
 @media (max-width:420px){.row{grid-template-columns:1fr;gap:0}.slot{grid-template-columns:8px 96px 1fr}.next .hrs{font-size:36px}}
 @media (prefers-reduced-motion:no-preference){.tabs button,.chip,.days button{transition:background .15s,border-color .15s,color .15s}}
@@ -182,6 +183,7 @@ h2{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppe
 </div></header>
 
 <main class="wrap">
+  <p class="disclaimer" role="note"><b>Herramienta de consulta no oficial.</b> Ante cualquier diferencia, vale la grilla oficial.</p>
   <div id="msg" class="msg" role="status" hidden></div>
   <section id="who" class="who"></section>
   <div id="tabs" class="tabs" role="tablist">
